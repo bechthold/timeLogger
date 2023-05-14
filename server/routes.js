@@ -1,11 +1,11 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+
+const userQueries = require('./userQueries');
+const tokenManagement = require('./tokenManagement');
+const errorHandlers = require('./errorHandlers');
 
 const db = require('./db');
-const {handleInternalError, handleMissingCredentials, handleInvalidCredentials} = require('./errorHandlers');
-
-const secretKey = process.env.SECRET_KEY;
 
 const router = express.Router();
 
@@ -20,57 +20,53 @@ const sendTokenMiddleware = (req, res, next) => {
   next();
 };
 
+// check user by login
 router.post('/login', (req, res, next) => {
   const {username, password} = req.body;
 
   if (!username || !password) {
-    handleMissingCredentials(res); // 400
+    errorHandlers.handleMissingCredentials(res);
     return;
   }
 
-  db.query('SELECT * FROM users WHERE username = ?', [username], (err, results) => {
+  userQueries.getUserByUsername(db, username, (err, results) => {
     if (err) {
-      handleInternalError(res, err); // 500
+      errorHandlers.handleInternalError(res, err);
       return;
     }
 
     if (results.length === 0) {
-      handleInvalidCredentials(res); // 401
+      errorHandlers.handleInvalidCredentials(res);
       return;
     }
-
+    // save user
     const user = results[0];
-
+    // check user password
     bcrypt.compare(password, user.password, (err, result) => {
       if (err) {
-        handleInternalError(res, err); // 500
+        errorHandlers.handleInternalError(res, err);
         return;
       }
 
       if (!result) {
-        handleInvalidCredentials(res); // 401
+        errorHandlers.handleInvalidCredentials(res);
         return;
       }
+      // create token
+      const token = tokenManagement.generateToken(user.id);
 
-      const token = jwt.sign({userId: user.id}, secretKey);
-
-      // Вычисление времени выпуска и времени истечения токена
       const issuedAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
-      const expirationTime = new Date(issuedAt);
-      expirationTime.setHours(expirationTime.getHours() + 1);
-
-      console.log(issuedAt);
-
-      // Сохранение токена, времени выпуска и времени истечения в базе данных
-      db.query('INSERT INTO sessions (user_id, token, issued_at, expiration_time) VALUES (?, ?, ?, ?)', [user.id, token, issuedAt, expirationTime], (err) => {
+      const expirationTime = tokenManagement.calculateExpirationTime(issuedAt);
+      //save session in database
+      userQueries.insertSession(db, user.id, token, issuedAt, expirationTime, (err) => {
         if (err) {
-          handleInternalError(res, err); // 500
+          errorHandlers.handleInternalError(res, err);
           return;
         }
 
         req.token = token;
         next();
-
+        // send response
         res.json({
           userId: user.id,
           message: 'Login successful'
@@ -79,6 +75,57 @@ router.post('/login', (req, res, next) => {
     });
   });
 });
+
+router.post('/signup', (req, res, next) => {
+  const {username, password} = req.body;
+  const saltRounds = Number(process.env.SALT_ROUNDS);
+
+  if (!username || !password) {
+    errorHandlers.handleMissingCredentials(res);
+    return;
+  }
+
+  // Hash the password
+  bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
+    if (err) {
+      errorHandlers.handleInternalError(res, err);
+      return;
+    }
+
+    // Save the user in the database
+    userQueries.insertUser(db, username, hashedPassword, (err, userId) => {
+      if (err) {
+        errorHandlers.handleInternalError(res, err);
+        return;
+      }
+
+      // Generate token
+      const token = tokenManagement.generateToken(userId);
+
+      const issuedAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
+      const expirationTime = tokenManagement.calculateExpirationTime(issuedAt);
+
+      // Save session in the database
+      userQueries.insertSession(db, userId, token, issuedAt, expirationTime, (err) => {
+        if (err) {
+          errorHandlers.handleInternalError(res, err);
+          return;
+        }
+
+        req.token = token;
+        next();
+
+        // Send response
+        res.json({
+          userId,
+          message: 'Signup successful'
+        });
+      });
+    });
+  });
+});
+
+
 
 router.use(sendTokenMiddleware);
 
