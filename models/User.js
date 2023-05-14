@@ -47,12 +47,12 @@ Model.prototype.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-const DEFAULT_SALT_ROUNDS = 10;
+//const DEFAULT_SALT_ROUNDS = 10;
 
 User.addHook("beforeCreate", async (user) => {
   const encryptedPassword = await bcrypt.hash(
     user.password,
-    DEFAULT_SALT_ROUNDS
+    Number(process.env.DEFAULT_SALT_ROUNDS)
   );
   user.password = encryptedPassword;
 });
