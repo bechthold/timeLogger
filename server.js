@@ -9,6 +9,7 @@ const {errorHandler} = require('./middlewares/errorHandler');
 // Import models
 const User = require('./models/User');
 const Category = require('./models/Category')
+const Timer = require('./models/Timer')
 
 const app = express();
 
@@ -32,10 +33,12 @@ app.use((req, res, next) => {
 // Route files
 const users = require('./routes/users');
 const categories = require('./routes/categories');
+const timers = require('./routes/timers');
 
 // Mount routers
 app.use(users);
 app.use(categories);
+app.use(timers);
 
 const PORT = process.env.PORT || 8080;
 
@@ -47,6 +50,18 @@ User.hasMany(Category, {
   onDelete: "CASCADE",
 });
 Category.belongsTo(User, { foreignKey: 'user_id' });
+
+User.hasMany(Timer, {
+  foreignKey: "user_id",
+  onDelete: "CASCADE",
+});
+Timer.belongsTo(User, {foreignKey: 'user_id'});
+
+Category.hasMany(Timer, {
+  foreignKey: "category_id",
+  onDelete: "CASCADE",
+})
+Timer.belongsTo(Category, {foreignKey: 'category_id'});
 
 const sync = async () => await sequelize.sync({force: true});
 
