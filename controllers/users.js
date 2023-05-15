@@ -25,17 +25,16 @@ module.exports.createUser = asyncHandler(async (req, res, next) => {
   user.dataValues.bio = null;
   user.dataValues.image = null;
 
-  res.status(201).join({user});
+  res.status(201).json({user});
 });
 
 module.exports.loginUser = asyncHandler(async (req, res, next) => {
   const {email, password} = req.body.user;
-  console.log(`req.body.user = ${req.body.user}`);
 
   fieldValidation(email, next);
   fieldValidation(password, next);
 
-  const user = User.findOne({
+  const user = await User.findOne({
     where: {
       email: email
     }
@@ -76,17 +75,19 @@ module.exports.getCurrentUser = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.updateUser = asyncHandler(async (req, res, next) => {
+  const { loggedUser } = req;
   await User.update(req.body.user, {
     where: {
-      id: req.user.id
-    }
+      id: loggedUser.id,
+    },
   });
 
-  const user = await User.findByPk(req.user.id);
-  user.dataValues.token = req.headers.authorization.split(' ')[1];
+  const user = await User.findByPk(loggedUser.id);
+  user.dataValues.token = req.headers.authorization.split(" ")[1];
 
-  res.status(200).json({user});
+  res.status(200).json({ user });
 });
+
 
 const fieldValidation = (field, next) => {
   if (!field) {
