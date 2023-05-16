@@ -13,7 +13,7 @@ module.exports.createUser = asyncHandler(async (req, res, next) => {
   const user = await User.create({
     email: email,
     password: password,
-    username: username
+    username: username,
   });
 
   if (user.dataValues.password) {
@@ -36,8 +36,8 @@ module.exports.loginUser = asyncHandler(async (req, res, next) => {
 
   const user = await User.findOne({
     where: {
-      email: email
-    }
+      email: email,
+    },
   });
 
   if (!user) {
@@ -60,9 +60,12 @@ module.exports.loginUser = asyncHandler(async (req, res, next) => {
   res.status(200).json({user});
 });
 
-
 module.exports.getCurrentUser = asyncHandler(async (req, res, next) => {
   const {loggedUser} = req;
+  await console.log(`loggedUser ${loggedUser}`);
+  if (!loggedUser) {
+    return next(new ErrorResponse(`Unauthorized`, 401));
+  }
   const user = await User.findByPk(loggedUser.id);
 
   if (!user) {
@@ -75,7 +78,7 @@ module.exports.getCurrentUser = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.updateUser = asyncHandler(async (req, res, next) => {
-  const { loggedUser } = req;
+  const {loggedUser} = req;
   await User.update(req.body.user, {
     where: {
       id: loggedUser.id,
@@ -83,15 +86,13 @@ module.exports.updateUser = asyncHandler(async (req, res, next) => {
   });
 
   const user = await User.findByPk(loggedUser.id);
-  user.dataValues.token = req.headers.authorization.split(" ")[1];
+  user.dataValues.token = req.headers.authorization.split(' ')[1];
 
-  res.status(200).json({ user });
+  res.status(200).json({user});
 });
-
 
 const fieldValidation = (field, next) => {
   if (!field) {
     return next(new ErrorResponse(`Missing fields`, 400));
   }
 };
-
