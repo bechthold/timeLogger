@@ -1,7 +1,7 @@
 import categoryApi from "@/api/category";
 
 const state = {
-  data: null,
+  categories: null,
   isLoading: false,
   error: null,
 };
@@ -22,11 +22,11 @@ const mutations = {
   },
   [mutationTypes.getAllCategoriesSuccess](state, payload) {
     state.isLoading = false;
-    state.data = payload;
+    state.categories = payload;
   },
   [mutationTypes.getAllCategoriesFailure](state) {
     state.isLoading = false;
-    state.data = [];
+    state.categories = [];
   },
 };
 

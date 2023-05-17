@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getItem } from "@/helpers/persistanceStorage";
 
-axios.defaults.baseURL = "http://localhost:3000";
+axios.defaults.baseURL = "http://192.168.0.9:3000";
 
 axios.interceptors.request.use((config) => {
   const token = getItem("accessToken");

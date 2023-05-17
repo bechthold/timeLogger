@@ -31,7 +31,7 @@ export default {
   computed: {
     ...mapState({
       isLoading: (state) => state.category.isLoading,
-      categories: (state) => state.category.data,
+      categories: (state) => state.category.categories,
       error: (state) => state.category.error,
     }),
   },
