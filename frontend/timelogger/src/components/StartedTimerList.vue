@@ -44,6 +44,7 @@
 import { mapState } from "vuex";
 import { actionTypes } from "@/store/modules/timer";
 import ComputedTime from "@/components/ComputedTime";
+import EventBus from "@/events/EventBus";
 
 export default {
   name: "TimerList",
@@ -62,6 +63,10 @@ export default {
   },
   mounted() {
     this.fetchTimers();
+    EventBus.$on("timerCreated", this.fetchTimers);
+  },
+  destroyed() {
+    EventBus.$off("timerCreated", this.fetchTimers);
   },
   methods: {
     fetchTimers() {

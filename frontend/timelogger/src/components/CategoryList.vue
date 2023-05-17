@@ -24,7 +24,9 @@
 
 <script>
 import { mapState } from "vuex";
-import { actionTypes } from "@/store/modules/category";
+import { actionTypes as categoryActionTypes } from "@/store/modules/category";
+import { actionTypes as timerActionTypes } from "@/store/modules/timer";
+import EventBus from "@/events/EventBus";
 
 export default {
   name: "TlaCategoryList",
@@ -41,7 +43,7 @@ export default {
   methods: {
     fetchCategories() {
       this.$store
-        .dispatch(actionTypes.getAllCategories)
+        .dispatch(categoryActionTypes.getAllCategories)
         .then(() => {
           console.log("Success");
         })
@@ -50,8 +52,19 @@ export default {
         });
     },
     handleCategoryClick(category) {
-      console.log("Category ID:", category.id);
-      console.log("Category Name:", category.name);
+      const timerData = {
+        category_id: category.id,
+        comment: null,
+      };
+      this.$store
+        .dispatch(timerActionTypes.createTimer, timerData)
+        .then((newTimer) => {
+          console.log("New Timer:", newTimer);
+          EventBus.$emit("timerCreated");
+        })
+        .catch((error) => {
+          console.error("Failed to create timer:", error);
+        });
     },
   },
 };
