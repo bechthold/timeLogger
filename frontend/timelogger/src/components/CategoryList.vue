@@ -72,13 +72,7 @@ export default {
 
 <style scoped>
 .row {
-  margin: -10px;
-}
-
-.col-lg-2,
-.col-md-4,
-.col-sm-6 {
-  padding: 10px;
+  margin-top: 30px;
 }
 
 .category-card {

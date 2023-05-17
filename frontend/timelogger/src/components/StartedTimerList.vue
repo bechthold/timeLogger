@@ -3,7 +3,7 @@
     <div v-if="startedTimers.length > 0">
       <div class="row">
         <div
-          class="col-lg-12 mb-4"
+          class="col-lg-12 mb-1"
           v-for="(timer, index) in startedTimers"
           :key="index"
         >
@@ -42,7 +42,7 @@
 
 <script>
 import { mapState } from "vuex";
-import { actionTypes } from "@/store/modules/timer";
+import { actionTypes as timerActionTypes } from "@/store/modules/timer";
 import ComputedTime from "@/components/ComputedTime";
 import EventBus from "@/events/EventBus";
 
@@ -64,14 +64,16 @@ export default {
   mounted() {
     this.fetchTimers();
     EventBus.$on("timerCreated", this.fetchTimers);
+    EventBus.$on("timerStopped", this.fetchTimers);
   },
   destroyed() {
     EventBus.$off("timerCreated", this.fetchTimers);
+    EventBus.$off("timerStopped", this.fetchTimers);
   },
   methods: {
     fetchTimers() {
       this.$store
-        .dispatch(actionTypes.getAllTimers)
+        .dispatch(timerActionTypes.getAllTimers)
         .then(() => {
           console.log("Success");
         })
@@ -83,7 +85,17 @@ export default {
       console.log("Pause", timer.Category.name);
     },
     handleStopClick(timer) {
-      console.log("Stop", timer.Category.name);
+      const updateData = { status: "finished" };
+      const timerId = timer.id;
+      this.$store
+        .dispatch(timerActionTypes.stopTimer, { timerId, updateData })
+        .then((stoppedTimer) => {
+          console.log("Timer stopped:", stoppedTimer);
+          EventBus.$emit("timerStopped");
+        })
+        .catch((error) => {
+          console.log("Failed to stop timer:", error);
+        });
     },
   },
 };
@@ -94,17 +106,13 @@ export default {
   margin: -10px;
 }
 
-.col-lg-12 {
-  padding: 10px;
-}
-
 .timer-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
   height: 100px;
-  padding: 10px;
+  padding: 0 20px;
   border: 1px solid #ccc;
 }
 
@@ -126,11 +134,6 @@ export default {
 
 .category-name {
   font-weight: bold;
-}
-
-.start-time,
-.comment {
-  margin-bottom: 5px;
 }
 
 .timer-actions button {

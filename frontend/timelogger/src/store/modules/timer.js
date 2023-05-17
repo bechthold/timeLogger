@@ -14,11 +14,16 @@ export const mutationTypes = {
   createTimerStart: "[timer] Create timer start",
   createTimerSuccess: "[timer] Create timer success",
   createTimerFailure: "[timer] Create timer failure",
+
+  stopTimerStart: "[timer] Stop timer start",
+  stopTimerSuccess: "[timer] Stop timer success",
+  stopTimerFailure: "[timer] Stop timer failure",
 };
 
 export const actionTypes = {
   getAllTimers: "[timer] Get all timers",
   createTimer: "[timer] Create timer",
+  stopTimer: "[timer] Stop timer",
 };
 
 const mutations = {
@@ -42,6 +47,24 @@ const mutations = {
     state.timers.push(newTimer);
   },
   [mutationTypes.createTimerFailure](state, error) {
+    state.isLoading = false;
+    state.error = error;
+  },
+  [mutationTypes.stopTimerStart](state) {
+    state.isLoading = true;
+    state.error = null;
+  },
+  [mutationTypes.stopTimerSuccess](state, stoppedTimer) {
+    state.isLoading = false;
+    // Update the timer in the timers array with the stoppedTimer data
+    const index = state.timers.findIndex(
+      (timer) => timer.id === stoppedTimer.id
+    );
+    if (index !== -1) {
+      state.timers[index] = stoppedTimer;
+    }
+  },
+  [mutationTypes.stopTimerFailure](state, error) {
     state.isLoading = false;
     state.error = error;
   },
@@ -76,6 +99,21 @@ const actions = {
         })
         .catch((error) => {
           context.commit(mutationTypes.createTimerFailure, error);
+          reject(error);
+        });
+    });
+  },
+  [actionTypes.stopTimer](context, { timerId, updateData }) {
+    context.commit(mutationTypes.stopTimerStart);
+    return new Promise((resolve, reject) => {
+      timerApi
+        .stoppedTimer(timerId, updateData)
+        .then((response) => {
+          context.commit(mutationTypes.stopTimerSuccess, response.data.timer);
+          resolve(response.data.timer);
+        })
+        .catch((error) => {
+          context.commit(mutationTypes.stopTimerFailure, error);
           reject(error);
         });
     });

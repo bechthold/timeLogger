@@ -3,7 +3,7 @@
     <div v-if="finishedTimers.length > 0">
       <div class="row">
         <div
-          class="col-lg-12 mb-4"
+          class="col-lg-12 mb-1"
           v-for="(timer, index) in finishedTimers"
           :key="index"
         >
@@ -38,6 +38,7 @@
 <script>
 import { mapState } from "vuex";
 import { actionTypes } from "@/store/modules/timer";
+import EventBus from "@/events/EventBus";
 
 export default {
   name: "FinishedTimerList",
@@ -51,9 +52,15 @@ export default {
       return this.timers.filter((timer) => timer.status === "finished");
     },
   },
+
   mounted() {
     this.fetchTimers();
+    EventBus.$on("timerStopped", this.fetchTimers);
   },
+  destroyed() {
+    EventBus.$off("timerStopped", this.fetchTimers);
+  },
+
   methods: {
     fetchTimers() {
       this.$store
@@ -85,16 +92,12 @@ export default {
   margin: -10px;
 }
 
-.col-lg-12 {
-  padding: 10px;
-}
-
 .timer-card {
   display: flex;
   align-items: center;
   width: 100%;
   height: 100px;
-  padding: 10px;
+  padding: 0 20px;
   border: 1px solid #ccc;
 }
 

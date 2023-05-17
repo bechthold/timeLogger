@@ -8,7 +8,12 @@ const createTimer = (timerData) => {
   return axios.post("/timers", { timer: timerData });
 };
 
+const stoppedTimer = (id, updateData) => {
+  return axios.put(`/timers/${id}`, { timer: updateData });
+};
+
 export default {
   getTimers,
   createTimer,
+  stoppedTimer,
 };
