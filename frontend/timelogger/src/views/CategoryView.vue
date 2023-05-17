@@ -1,10 +1,17 @@
 <template>
-  <div>Categories</div>
+  <div>
+    <h1>Categories</h1>
+    <TlaCategoryList />
+  </div>
 </template>
 
 <script>
+import TlaCategoryList from "@/components/CategoryList";
+
 export default {
-  // eslint-disable-next-line vue/multi-word-component-names
-  name: "categories",
+  name: "CategoryView",
+  components: {
+    TlaCategoryList,
+  },
 };
 </script>
