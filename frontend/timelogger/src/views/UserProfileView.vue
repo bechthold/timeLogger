@@ -11,12 +11,15 @@
 </template>
 
 <script>
+import eventBus from "@/events/EventBus";
+
 export default {
   name: "UserProfile",
 
   methods: {
     handleLogout() {
       localStorage.removeItem("accessToken");
+      eventBus.$emit("logout");
       this.$router.push({ name: "login" });
     },
   },

@@ -77,8 +77,9 @@
 </template>
 
 <script>
-import { getterTypes } from "@/store/modules/auth";
-import { mapGetters } from "vuex";
+import { getterTypes, mutationTypes } from "@/store/modules/auth";
+import { mapGetters, mapMutations } from "vuex";
+import eventBus from "@/events/EventBus";
 
 export default {
   name: "TlaTopBar",
@@ -89,20 +90,34 @@ export default {
       isAnonymous: getterTypes.isAnonymous,
     }),
   },
+  created() {
+    eventBus.$on("logout", this.handleLogout);
+    eventBus.$on("login", this.handleLogout);
+  },
+  destroyed() {
+    eventBus.$off("logout", this.handleLogin);
+    eventBus.$off("login", this.handleLogin);
+  },
+
+  methods: {
+    ...mapMutations({
+      setLoggedIn: mutationTypes.SET_LOGGED_IN,
+    }),
+
+    handleLogout() {
+      console.log("Update top bar logout");
+      this.setLoggedIn(false);
+    },
+
+    handleLogin() {
+      console.log("Update top bar login");
+      this.setLoggedIn(true);
+    },
+  },
 };
 </script>
 
 <style scoped>
-.user-pic {
-  width: 40px;
-  border-radius: 20px;
-  margin-left: 8px;
-}
-
-.user-link {
-  height: 58px;
-}
-
 .nav-item {
   height: 60px;
   display: flex;

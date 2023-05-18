@@ -44,8 +44,8 @@ module.exports.loginUser = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(`User not found`, 404));
   }
 
-  const isMatch = user.matchPassword(password);
-
+  const isMatch = await user.matchPassword(password);
+  // await!!!
   if (!isMatch) {
     return next(new ErrorResponse(`Wrong password`, 401));
   }

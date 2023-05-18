@@ -65,6 +65,23 @@ import ComputedTime from "@/components/ComputedTime";
 import EventBus from "@/events/EventBus";
 import ModalUpdateObject from "@/components/ModalUpdateObject.vue";
 
+export function handleStopClick(timer) {
+  const updateData = {
+    status: "finished",
+    finish_time: new Date().toISOString(),
+  };
+  const timerId = timer.id;
+  this.$store
+    .dispatch(timerActionTypes.updateTimer, { timerId, updateData })
+    .then((stoppedTimer) => {
+      console.log("Timer stopped:", stoppedTimer);
+      EventBus.$emit("timerStopped");
+    })
+    .catch((error) => {
+      console.log("Failed to stop timer:", error);
+    });
+}
+
 export default {
   name: "TimerList",
   components: {
@@ -142,22 +159,7 @@ export default {
       this.showModal = false;
     },
 
-    handleStopClick(timer) {
-      const updateData = {
-        status: "finished",
-        finish_time: new Date().toISOString(),
-      };
-      const timerId = timer.id;
-      this.$store
-        .dispatch(timerActionTypes.updateTimer, { timerId, updateData })
-        .then((stoppedTimer) => {
-          console.log("Timer stopped:", stoppedTimer);
-          EventBus.$emit("timerStopped");
-        })
-        .catch((error) => {
-          console.log("Failed to stop timer:", error);
-        });
-    },
+    handleStopClick,
   },
 };
 </script>

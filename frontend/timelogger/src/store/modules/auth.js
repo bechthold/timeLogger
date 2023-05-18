@@ -21,6 +21,8 @@ export const mutationTypes = {
   getCurrentUserStart: "[auth] Get current user start",
   getCurrentUserSuccess: "[auth] Get current user success",
   getCurrentUserFailure: "[auth] Get current user failure",
+
+  SET_LOGGED_IN: "SET_LOGGED_IN",
 };
 
 export const actionTypes = {
@@ -88,6 +90,10 @@ const mutations = {
     state.isLoading = false;
     state.isLoggedIn = false;
     state.currentUser = null;
+  },
+
+  [mutationTypes.SET_LOGGED_IN](state, value) {
+    state.isLoggedIn = value;
   },
 };
 

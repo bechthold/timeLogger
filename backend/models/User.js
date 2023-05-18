@@ -16,29 +16,29 @@ const User = sequelize.define(
     email: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true
+      unique: true,
     },
 
     username: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true
+      unique: true,
     },
 
     password: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
 
     bio: {
       type: DataTypes.TEXT,
-      allowNull: true
+      allowNull: true,
     },
 
     image: {
       type: DataTypes.TEXT,
-      allowNull: true
-    }
+      allowNull: true,
+    },
   },
   {timestamps: false}
 );
@@ -47,9 +47,7 @@ Model.prototype.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-//const DEFAULT_SALT_ROUNDS = 10;
-
-User.addHook("beforeCreate", async (user) => {
+User.addHook('beforeCreate', async (user) => {
   const encryptedPassword = await bcrypt.hash(
     user.password,
     Number(process.env.DEFAULT_SALT_ROUNDS)
@@ -58,5 +56,3 @@ User.addHook("beforeCreate", async (user) => {
 });
 
 module.exports = User;
-
-
