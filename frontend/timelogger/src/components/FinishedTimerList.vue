@@ -15,10 +15,13 @@
                 class="category-icon"
               />
               <div class="timer-details">
-                <div class="category-name">{{ timer.Category.name }}</div>
+                <div class="category-name">
+                  {{ timer.Category.name }} -
+                  {{ formatDiffTime(timer.start_time, timer.finish_time) }}
+                </div>
                 <div class="elapsed-time">
-                  {{ formatTime(timer.start_time) }} -
-                  {{ formatTime(timer.finish_time) }}
+                  {{ formatFullDate(timer.start_time) }} -
+                  {{ formatFullDate(timer.finish_time) }}
                 </div>
                 <div class="category-comment">
                   {{ timer.comment }}
@@ -39,6 +42,7 @@
 import { mapState } from "vuex";
 import { actionTypes } from "@/store/modules/timer";
 import EventBus from "@/events/EventBus";
+import { formatFullDate, formatDiffTime } from "@/helpers/time";
 
 export default {
   name: "FinishedTimerList",
@@ -49,7 +53,9 @@ export default {
       error: (state) => state.timer.error,
     }),
     finishedTimers() {
-      return this.timers.filter((timer) => timer.status === "finished");
+      return this.timers
+        .filter((timer) => timer.status === "finished")
+        .reverse();
     },
   },
 
@@ -62,6 +68,8 @@ export default {
   },
 
   methods: {
+    formatFullDate,
+    formatDiffTime,
     fetchTimers() {
       this.$store
         .dispatch(actionTypes.getAllTimers)
@@ -71,17 +79,6 @@ export default {
         .catch(() => {
           console.log("Failure");
         });
-    },
-    formatTime(dateTime) {
-      const date = new Date(dateTime);
-      const year = date.getFullYear();
-      const month = (date.getMonth() + 1).toString().padStart(2, "0");
-      const day = date.getDate().toString().padStart(2, "0");
-      const hours = date.getHours().toString().padStart(2, "0");
-      const minutes = date.getMinutes().toString().padStart(2, "0");
-      const seconds = date.getSeconds().toString().padStart(2, "0");
-
-      return `${day}.${month}.${year} ${hours}:${minutes}:${seconds}`;
     },
   },
 };

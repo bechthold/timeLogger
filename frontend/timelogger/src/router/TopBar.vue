@@ -21,6 +21,16 @@
             <li class="nav-item">
               <router-link
                 class="nav-link"
+                :to="{ name: 'logger' }"
+                exact
+                active-class="active"
+              >
+                <i class="ion-compose"></i> Logger
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link
+                class="nav-link"
                 :to="{ name: 'categories' }"
                 exact
                 active-class="active"
@@ -30,13 +40,11 @@
             </li>
             <li class="nav-item">
               <router-link
-                class="nav-link"
+                class="nav-link user-link"
                 :to="{ name: 'userProfile', params: { id: currentUser.id } }"
-                exact
-                active-class="active"
               >
-                <img class="user-pic" :src="currentUser.image" />
                 {{ currentUser.username }}
+                <img class="user-pic" :src="currentUser.image" />
               </router-link>
             </li>
           </template>
@@ -83,3 +91,21 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.user-pic {
+  width: 40px;
+  border-radius: 20px;
+  margin-left: 8px;
+}
+
+.user-link {
+  height: 58px;
+}
+
+.nav-item {
+  height: 60px;
+  display: flex;
+  align-items: center;
+}
+</style>

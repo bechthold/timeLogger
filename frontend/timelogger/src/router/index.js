@@ -1,18 +1,24 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 
-import Home from "@/views/HomeView.vue";
 import TlaRegister from "@/views/RegisterView.vue";
 import TlaLogin from "@/views/LoginView.vue";
+import TlaLogger from "@/views/LoggerView.vue";
 import TlaCategory from "@/views/CategoryView.vue";
+import TlaUserProfile from "@/views/UserProfileView.vue";
 
 Vue.use(VueRouter);
 
 const routes = [
   {
-    path: "/",
+    path: "/categories",
+    name: "categories",
+    component: TlaCategory,
+  },
+  {
+    path: "/logger",
     name: "home",
-    component: Home,
+    component: TlaLogger,
   },
   {
     path: "/register",
@@ -25,9 +31,14 @@ const routes = [
     component: TlaLogin,
   },
   {
-    path: "/categories",
-    name: "categories",
-    component: TlaCategory,
+    path: "/logger",
+    name: "logger",
+    component: TlaLogger,
+  },
+  {
+    path: "/user",
+    name: "userProfile",
+    component: TlaUserProfile,
   },
 ];
 

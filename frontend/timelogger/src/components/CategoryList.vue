@@ -3,7 +3,7 @@
     <div v-if="categories">
       <div class="row">
         <div
-          class="col-lg-2 col-md-4 col-sm-6 mb-4"
+          class="col-lg-2 col-md-4 col-sm-6 mt-4"
           v-for="(category, index) in categories"
           :key="index"
           @click="handleCategoryClick(category)"
@@ -71,8 +71,12 @@ export default {
 </script>
 
 <style scoped>
-.row {
-  margin-top: 30px;
+.col-lg-2,
+.col-md-4,
+.col-sm-6 {
+  padding: 10px;
+  margin-right: 30px;
+  margin-left: 20px;
 }
 
 .category-card {

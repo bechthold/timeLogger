@@ -15,15 +15,15 @@ export const mutationTypes = {
   createTimerSuccess: "[timer] Create timer success",
   createTimerFailure: "[timer] Create timer failure",
 
-  stopTimerStart: "[timer] Stop timer start",
-  stopTimerSuccess: "[timer] Stop timer success",
-  stopTimerFailure: "[timer] Stop timer failure",
+  updateTimerStart: "[timer] Update timer start",
+  updateTimerSuccess: "[timer] Update timer success",
+  updateTimerFailure: "[timer] Update timer failure",
 };
 
 export const actionTypes = {
   getAllTimers: "[timer] Get all timers",
   createTimer: "[timer] Create timer",
-  stopTimer: "[timer] Stop timer",
+  updateTimer: "[timer] Update timer",
 };
 
 const mutations = {
@@ -50,11 +50,11 @@ const mutations = {
     state.isLoading = false;
     state.error = error;
   },
-  [mutationTypes.stopTimerStart](state) {
+  [mutationTypes.updateTimerStart](state) {
     state.isLoading = true;
     state.error = null;
   },
-  [mutationTypes.stopTimerSuccess](state, stoppedTimer) {
+  [mutationTypes.updateTimerSuccess](state, stoppedTimer) {
     state.isLoading = false;
     // Update the timer in the timers array with the stoppedTimer data
     const index = state.timers.findIndex(
@@ -64,7 +64,7 @@ const mutations = {
       state.timers[index] = stoppedTimer;
     }
   },
-  [mutationTypes.stopTimerFailure](state, error) {
+  [mutationTypes.updateTimerFailure](state, error) {
     state.isLoading = false;
     state.error = error;
   },
@@ -103,17 +103,17 @@ const actions = {
         });
     });
   },
-  [actionTypes.stopTimer](context, { timerId, updateData }) {
-    context.commit(mutationTypes.stopTimerStart);
+  [actionTypes.updateTimer](context, { timerId, updateData }) {
+    context.commit(mutationTypes.updateTimerStart);
     return new Promise((resolve, reject) => {
       timerApi
-        .stoppedTimer(timerId, updateData)
+        .updateTimer(timerId, updateData)
         .then((response) => {
-          context.commit(mutationTypes.stopTimerSuccess, response.data.timer);
+          context.commit(mutationTypes.updateTimerSuccess, response.data.timer);
           resolve(response.data.timer);
         })
         .catch((error) => {
-          context.commit(mutationTypes.stopTimerFailure, error);
+          context.commit(mutationTypes.updateTimerFailure, error);
           reject(error);
         });
     });

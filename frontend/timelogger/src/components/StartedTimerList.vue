@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="startedTimers.length > 0">
+    <div v-if="startedTimers">
       <div class="row">
         <div
           class="col-lg-12 mb-1"
@@ -21,10 +21,28 @@
                 </div>
                 <div class="comment">{{ timer.comment }}</div>
               </div>
+
+              <ModalUpdateObject
+                v-model="showModal"
+                :title="'Comment'"
+                @ok="handleOkClick"
+                @cancel="handleCancelClick"
+              >
+                <input
+                  class="form-control"
+                  v-model="tempComment"
+                  @keydown.enter="handleOkClick"
+                  @keydown.esc="handleCancelClick"
+                />
+              </ModalUpdateObject>
             </div>
+
             <div class="timer-actions">
-              <button @click="handlePauseClick(timer)" class="btn btn-primary">
-                Pause
+              <button
+                @click="handleCommentClick(timer)"
+                class="btn btn-primary"
+              >
+                Comment
               </button>
               <button @click="handleStopClick(timer)" class="btn btn-danger">
                 Stop
@@ -45,11 +63,20 @@ import { mapState } from "vuex";
 import { actionTypes as timerActionTypes } from "@/store/modules/timer";
 import ComputedTime from "@/components/ComputedTime";
 import EventBus from "@/events/EventBus";
+import ModalUpdateObject from "@/components/ModalUpdateObject.vue";
 
 export default {
   name: "TimerList",
   components: {
     ComputedTime,
+    ModalUpdateObject,
+  },
+  data() {
+    return {
+      showModal: false,
+      tempComment: "",
+      timerId: null,
+    };
   },
   computed: {
     ...mapState({
@@ -58,16 +85,20 @@ export default {
       error: (state) => state.timer.error,
     }),
     startedTimers() {
-      return this.timers.filter((timer) => timer.status === "started");
+      return this.timers
+        .filter((timer) => timer.status === "started")
+        .reverse();
     },
   },
   mounted() {
     this.fetchTimers();
     EventBus.$on("timerCreated", this.fetchTimers);
+    EventBus.$on("timerUpdated", this.fetchTimers);
     EventBus.$on("timerStopped", this.fetchTimers);
   },
   destroyed() {
     EventBus.$off("timerCreated", this.fetchTimers);
+    EventBus.$off("timerUpdated", this.fetchTimers);
     EventBus.$off("timerStopped", this.fetchTimers);
   },
   methods: {
@@ -81,14 +112,44 @@ export default {
           console.log("Failure");
         });
     },
-    handlePauseClick(timer) {
-      console.log("Pause", timer.Category.name);
+    handleCommentClick(timer) {
+      this.showModal = true;
+      this.tempComment = timer.comment;
+      this.timerId = timer.id;
     },
+
+    handleOkClick() {
+      this.showModal = false;
+      const updateData = {
+        comment: this.tempComment,
+      };
+
+      this.$store
+        .dispatch(timerActionTypes.updateTimer, {
+          timerId: this.timerId,
+          updateData,
+        })
+        .then((updatedTimer) => {
+          console.log("Timer updated:", updatedTimer);
+          EventBus.$emit("timerUpdated");
+        })
+        .catch((error) => {
+          console.log("Failed to update timer:", error);
+        });
+    },
+
+    handleCancelClick() {
+      this.showModal = false;
+    },
+
     handleStopClick(timer) {
-      const updateData = { status: "finished" };
+      const updateData = {
+        status: "finished",
+        finish_time: new Date().toISOString(),
+      };
       const timerId = timer.id;
       this.$store
-        .dispatch(timerActionTypes.stopTimer, { timerId, updateData })
+        .dispatch(timerActionTypes.updateTimer, { timerId, updateData })
         .then((stoppedTimer) => {
           console.log("Timer stopped:", stoppedTimer);
           EventBus.$emit("timerStopped");
@@ -138,5 +199,42 @@ export default {
 
 .timer-actions button {
   margin-left: 10px;
+}
+
+.modal-dialog {
+  width: 900px;
+}
+
+.comment {
+  margin-top: -12px;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 0 30px;
+  border-radius: 4px;
+}
+
+.modal-content textarea {
+  width: 100%;
+  height: 100px;
+  margin-bottom: 10px;
+}
+
+.modal-content button {
+  margin-right: 10px;
 }
 </style>
