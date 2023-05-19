@@ -1,9 +1,9 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container">
-      <router-link class="navbar-brand" :to="{ name: 'home' }"
-        >TimeLogger</router-link
-      >
+      <router-link class="navbar-brand" :to="{ name: 'home' }">
+        TimeLogger
+      </router-link>
       <button
         class="navbar-toggler"
         type="button"
@@ -41,10 +41,18 @@
             <li class="nav-item">
               <router-link
                 class="nav-link user-link"
-                :to="{ name: 'userProfile', params: { id: currentUser.id } }"
+                :to="{
+                  name: 'userProfile',
+                  params: { id: currentUser.id },
+                  key: $route.fullPath,
+                }"
               >
                 {{ currentUser.username }}
-                <img class="user-pic" :src="currentUser.image" />
+                <img
+                  class="user-pic"
+                  :src="currentUser.image"
+                  alt="user picture"
+                />
               </router-link>
             </li>
           </template>
@@ -52,7 +60,7 @@
             <li class="nav-item">
               <router-link
                 class="nav-link"
-                :to="{ name: 'login' }"
+                :to="{ name: 'login', key: $route.fullPath }"
                 exact
                 active-class="active"
               >
@@ -62,7 +70,7 @@
             <li class="nav-item">
               <router-link
                 class="nav-link"
-                :to="{ name: 'register' }"
+                :to="{ name: 'register', key: $route.fullPath }"
                 exact
                 active-class="active"
               >

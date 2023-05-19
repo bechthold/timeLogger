@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import TlaTopBar from "@/router/TopBar.vue";
+import TlaTopBar from "@/components/TopBar.vue";
 import { actionTypes } from "@/store/modules/auth";
 
 export default {

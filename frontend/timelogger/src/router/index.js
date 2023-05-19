@@ -6,6 +6,7 @@ import TlaLogin from "@/views/LoginView.vue";
 import TlaLogger from "@/views/LoggerView.vue";
 import TlaCategory from "@/views/CategoryView.vue";
 import TlaUserProfile from "@/views/UserProfileView.vue";
+import TlaHome from "@/views/HomeView.vue";
 
 Vue.use(VueRouter);
 
@@ -16,9 +17,9 @@ const routes = [
     component: TlaCategory,
   },
   {
-    path: "/logger",
-    name: "home",
-    component: TlaLogger,
+    path: "/",
+    name: "homePage",
+    component: TlaHome,
   },
   {
     path: "/register",
