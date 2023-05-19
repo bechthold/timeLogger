@@ -48,11 +48,7 @@
                 }"
               >
                 {{ currentUser.username }}
-                <img
-                  class="user-pic"
-                  :src="currentUser.image"
-                  alt="user picture"
-                />
+                <img class="user-pic" :src="currentUser.image" />
               </router-link>
             </li>
           </template>

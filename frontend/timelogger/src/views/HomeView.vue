@@ -43,7 +43,8 @@ import { mapGetters } from "vuex";
 import { getterTypes } from "@/store/modules/auth";
 
 export default {
-  name: "HomeView",
+  name: "TlaHome",
+
   computed: {
     ...mapGetters({
       currentUser: getterTypes.currentUser,

@@ -18,7 +18,7 @@ const routes = [
   },
   {
     path: "/",
-    name: "homePage",
+    name: "home",
     component: TlaHome,
   },
   {
