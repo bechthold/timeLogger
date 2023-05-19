@@ -1,15 +1,13 @@
 require('dotenv').config();
 const express = require('express');
 const sequelize = require('./util/database');
-const morgan = require('morgan');
 const colors = require('colors');
 const {errorHandler} = require('./middlewares/errorHandler');
 
-
 // Import models
 const User = require('./models/User');
-const Category = require('./models/Category')
-const Timer = require('./models/Timer')
+const Category = require('./models/Category');
+const Timer = require('./models/Timer');
 
 const app = express();
 
@@ -46,21 +44,21 @@ app.use(errorHandler);
 
 // Relations
 User.hasMany(Category, {
-  foreignKey: "user_id",
-  onDelete: "CASCADE",
+  foreignKey: 'user_id',
+  onDelete: 'CASCADE',
 });
-Category.belongsTo(User, { foreignKey: 'user_id' });
+Category.belongsTo(User, {foreignKey: 'user_id'});
 
 User.hasMany(Timer, {
-  foreignKey: "user_id",
-  onDelete: "CASCADE",
+  foreignKey: 'user_id',
+  onDelete: 'CASCADE',
 });
 Timer.belongsTo(User, {foreignKey: 'user_id'});
 
 Category.hasMany(Timer, {
-  foreignKey: "category_id",
-  onDelete: "CASCADE",
-})
+  foreignKey: 'category_id',
+  onDelete: 'CASCADE',
+});
 Timer.belongsTo(Category, {foreignKey: 'category_id'});
 
 const sync = async () => await sequelize.sync({force: true});
@@ -69,43 +67,25 @@ sync().then(async () => {
   await User.create({
     email: 'test1@test.com',
     username: 'test1',
-    password: '123456'
+    password: '123456',
   });
   await User.create({
     email: 'test2@test.com',
     username: 'test2',
-    password: '123456'
+    password: '123456',
   });
 
   await Category.create({
     name: 'project1',
     icon: null,
-    user_id: 1
+    user_id: 1,
   });
   await Category.create({
     name: 'project2',
     icon: null,
-    user_id: 1
+    user_id: 1,
   });
 });
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`.yellow.bold);
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

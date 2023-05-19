@@ -17,8 +17,8 @@
 
       <p>
         To manage
-        <router-link :to="{ name: 'userProfile' }">your account</router-link>,
-        click on your name in the header of the website.
+        <router-link :to="{ name: 'userProfile' }">your account</router-link>
+        , click on your name in the header of the website.
       </p>
     </div>
 
@@ -27,7 +27,7 @@
 
       <p>
         If you don't have an account yet, click
-        <router-link :to="{ name: 'register' }"> Sign up </router-link>
+        <router-link :to="{ name: 'register' }"> Sign up</router-link>
       </p>
 
       <p>
